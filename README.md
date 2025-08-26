@@ -20,6 +20,21 @@ To run the project, follow these steps:
 
 This will process the input CSV and generate a `challenge_scored.csv` file in the same directory, which includes the original data plus two new columns: `similarity` and `error`.
 
+### Testing
+
+The project includes a comprehensive test suite. You can run the tests with:
+```bash
+poetry run pytest
+```
+The suite includes:
+- **Unit Tests:** Offline tests that mock network requests and model loading to verify the core logic of each component.
+- **Integration Test:** An offline test that verifies the end-to-end CSV processing pipeline.
+- **Semantic Coherence Tests:** A suite of tests that run against the live model to validate its performance on a small, curated dataset. These tests ensure that:
+    1.  Correctly paired images and captions score higher on average than shuffled (incorrect) pairs.
+    2.  For a set of distinctive images, each caption correctly retrieves its corresponding image with the highest score.
+    3.  Higher-quality captions result in higher scores than irrelevant captions for the same image.
+    4.  Scores are deterministic and stable across multiple runs.
+
 ---
 
 ## Question 1: Code to Compute the Similarity Metric
@@ -33,7 +48,7 @@ The main logic is encapsulated in the `score_pairs` function (`text_image_simila
 1.  **Concurrent Image Downloading:** Images are downloaded from their URLs in parallel using a `ThreadPoolExecutor` for a significant speed-up. The process includes a configurable timeout and retry mechanism for robustness.
 2.  **Preprocessing:** Both the downloaded images and the text captions are preprocessed using the processor from the `openai/clip-vit-base-patch32` model. This converts the raw data into the numerical tensors the model requires.
 3.  **Embedding Generation:** The preprocessed images and texts are passed to the pre-trained CLIP model, which generates numerical vector representations (embeddings) for each.
-4.  **Similarity Calculation:** The cosine similarity between the image and text embeddings is calculated. The model's direct output (logits) is used as the final similarity score, representing how well the text describes the image.
+4.  **Similarity Calculation:** The cosine similarity between the image and text embeddings is calculated. The model's direct output (logits) is then normalized to a user-friendly **0-1 range** and rounded to four decimal places to produce the final score.
 
 ### Execution Flow
 
