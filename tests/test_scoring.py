@@ -79,9 +79,10 @@ def test_score_pairs_returns_correct_scores(mock_downloader):
 
     assert len(results) == 2
     assert all(isinstance(r, ScoreResult) for r in results)
-    assert results[0].score == 25.0
+    # 25.0 normalized and rounded -> round(0.625, 4) = 0.625
+    assert results[0].score == 0.625
     assert results[0].error is None
-    assert results[1].score == 25.0
+    assert results[1].score == 0.625
     assert results[1].error is None
 
 
@@ -99,7 +100,7 @@ def test_score_pairs_handles_download_failure(mock_downloader):
     results = list(score_pairs(records, model, processor, config))
 
     assert len(results) == 2
-    assert results[0].score == 25.0
+    assert results[0].score == 0.625
     assert results[0].error is None
     assert pd.isna(results[1].score)
     assert results[1].error == "Image download failed"

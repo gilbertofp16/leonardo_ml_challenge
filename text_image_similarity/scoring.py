@@ -98,7 +98,11 @@ def score_pairs(
 
                     for i, score in zip(valid_indices_in_batch, scores_list):
                         record = batch_records[i]
-                        batch_results[i] = ScoreResult(url=record.url, score=float(score))
+                        # Normalize score to 0-1 range and round
+                        normalized_score = (score / 100.0 + 1.0) / 2.0
+                        batch_results[i] = ScoreResult(
+                            url=record.url, score=round(float(normalized_score), 4)
+                        )
 
                 except Exception as e:
                     error_msg = f"Error processing batch: {e}"
