@@ -1,0 +1,95 @@
+<IMPORTANT_RULES>
+  <CRITICAL>
+    <PRINCIPLE priority="1">Never assume missing context — ask clarifying questions if uncertain.</PRINCIPLE>
+    <PRINCIPLE priority="2">Never hallucinate libraries or functions — use only known, verified packages.</PRINCIPLE>
+    <PRINCIPLE priority="3">Always confirm file paths and module names exist before referencing them.</PRINCIPLE>
+    <PRINCIPLE priority="4">Always look at available code and suggest reuse of existing utilities if appropriate.</PRINCIPLE>
+    <PRINCIPLE priority="5">Always mention which Cursor rules you applied in each response.</PRINCIPLE>
+    <PRINCIPLE priority="6">Always generate accompanying unit tests (e.g. pytest) for any non-trivial code.</PRINCIPLE>
+    <PRINCIPLE priority="7">Mock test data according to actual data structures. If mock data is reusable, extract it to a shared module or file.</PRINCIPLE>
+    <PRINCIPLE priority="8">Always validate input and output structures when dealing with APIs or endpoints. This applies across all programming languages.</PRINCIPLE>
+    <PRINCIPLE priority="9">Confirm external dependencies: verify the latest stable version and import path before use.</PRINCIPLE>
+    <PRINCIPLE priority="10">Surface performance considerations: note time and space complexity for algorithmic code.</PRINCIPLE>
+    <PRINCIPLE priority="11">Always outline your error handling strategy before coding.</PRINCIPLE>
+    <PRINCIPLE priority="12">Echo the minimal file or directory structure when referring to paths.</PRINCIPLE>
+    <PRINCIPLE priority="13">Execute all tasks with the proficiency of a senior software developer in the target language.</PRINCIPLE>
+    <PRINCIPLE priority="14">Never expose, log, or consume API keys, secrets, or .env variables in code, tests, or documentation. Always use environment variable mocking or secure injection for testing.</PRINCIPLE>
+    <PRINCIPLE priority="15">CLINE must respect .clineignore and never read, parse, or suggest the contents of ignored files such as .env, secrets, or credentials.</PRINCIPLE>
+  </CRITICAL>
+
+  <ENFORCEMENT>
+    <RULE>All rules are mandatory unless explicitly overridden by user instruction.</RULE>
+    <RULE>Rules take precedence over conversational guidance or suggestions.</RULE>
+  </ENFORCEMENT>
+
+  <CODING_RULES>
+    <GENERAL>
+      <RULE id="GEN001">Follow Clean Code principles across all languages: meaningful names, small functions, avoid duplication, expressive tests, clear formatting.</RULE>
+      <RULE id="GEN002"><![CDATA[
+        Adhere to SOLID principles:
+        1. Single Responsibility
+        2. Open/Closed
+        3. Liskov Substitution
+        4. Interface Segregation
+        5. Dependency Inversion
+      ]]></RULE>
+      <RULE id="GEN003">If your code interacts with endpoints, always define and enforce data structures for request and response validation.</RULE>
+      <RULE id="GEN004">Never hardcode or directly consume API keys or values from .env files in examples, tests, or code snippets. Always mock or safely inject them to prevent exposure.</RULE>
+      <RULE id="GEN005">Minimal exception scope. Do not wrap imports or trivial statements in try/except. Catch the narrowest exception only where handled; re-raise with context.</RULE>
+      <RULE id="GEN006"><![CDATA[
+        Dependency import policy:
+        A) Required deps MUST be imported unconditionally at module import (no try/except).
+        B) Optional deps MUST be imported inside functions that need them; on absence, catch ModuleNotFoundError ONLY and raise RuntimeError with a brief install hint.
+        C) PROHIBITED: setting missing modules to None, printing warnings, or continuing after ImportError.
+      ]]></RULE>
+      <RULE id="GEN007">Do not hardcode descriptive strings for agents, roles, goals, or backstories. Load from configuration (YAML/JSON/TOML) and reference parsed values.</RULE>
+      <RULE id="GEN008">No silent degradation. Missing required capabilities must fail fast with precise exceptions. No prints for warnings; use logging and raise.</RULE>
+    </GENERAL>
+
+    <PYTHON>
+      <RULE id="PY001">Avoid code comments. Functions should be self documenting with expressive names.</RULE>
+      <RULE id="PY002">Decompose complex logic. Each function has a single responsibility.</RULE>
+      <RULE id="PY003">Use PEP 257 docstrings on every public class or function.</RULE>
+      <RULE id="PY004">Enforce type hints on all function signatures.</RULE>
+      <RULE id="PY005">One logical statement per line. No chained assignments or multiple expressions per line.</RULE>
+      <RULE id="PY006">Fail fast with clear exceptions. Validate inputs at entry and raise precise ValueError or custom exceptions.</RULE>
+      <RULE id="PY007">Prefer a single exit point per function where practical.</RULE>
+      <RULE id="PY008">Prefer pure functions. Isolate side effects into clearly named wrappers.</RULE>
+      <RULE id="PY009">Always include a See also section in docstrings linking to related utilities or modules.</RULE>
+      <RULE id="PY010">Group related functions into modules rather than monoliths.</RULE>
+      <RULE id="PY011">Max three parameters per function. Inject dependencies rather than using globals.</RULE>
+      <RULE id="PY012">Format with Black, line length 120.</RULE>
+      <RULE id="PY013">Use Poetry for dependency management and venvs.</RULE>
+      <RULE id="PY014">Cookiecutter layout: src/, tests/, pyproject.toml, README.md, docs/.</RULE>
+      <RULE id="PY015">In pytest, mock data structures to match real usage; extract reusable mocks.</RULE>
+
+      <!-- New structural enforcement -->
+      <RULE id="PY016">Top-level code policy. At import time, only constants, dataclasses, type aliases, and logger setup are allowed. No I/O, no object construction, no event loops, no client/vectorstore/LLM instantiation.</RULE>
+      <RULE id="PY017">Import policy. Required deps are imported unconditionally. Do not wrap required imports in try/except. Verify import paths against the project tree.</RULE>
+      <RULE id="PY018">Main guard. All executable logic must be in functions or classes and invoked only under `if __name__ == "__main__":` via a small `main()`.</RULE>
+      <RULE id="PY019">Async boundaries. Never call `asyncio.run` at import time or in lambdas created at import. Provide sync adapters inside functions or main guard.</RULE>
+      <RULE id="PY020">Config access. Loading YAML or other config happens inside functions, parameterized by path; may be cached lazily inside those functions only. On missing or invalid config, raise ValueError with the offending path.</RULE>
+      <RULE id="PY021">Globals discipline. Allowed: LOGGER, DEFAULTS, TypedDict/dataclass, simple constants, DI tokens. Prohibited: constructed clients like LLMs, embeddings, vectorstores, retrievers, or Agents at import time.</RULE>
+      <RULE id="PY022">Factories required. Provide `make_llm()`, `make_embeddings()`, `make_vectorstore()`, `make_retriever()`, and `make_agent()` factories. Do not instantiate these at module import.</RULE>
+      <RULE id="PY023">Error handling strategy first. For I/O and external systems, list expected failures and how each is surfaced. Keep try/except around the minimum failing lines; raise precise, contextual exceptions. Broad `except Exception` is prohibited.</RULE>
+      <RULE id="PY024">Testable structure. Provide adapters for side effects so tests can mock them. No top-level execution paths. Include pytest cases for config loader and all factories.</RULE>
+      <RULE id="PY025">No prints. Use the `logging` module for diagnostics. `print()` is prohibited in library code; allowed only in CLIs under the main guard.</RULE>
+      <RULE id="PY026">No default fallbacks for config-driven fields. Do not use `'Default Role'`, `'Default Goal'`, etc. If required fields are missing in config, raise `ValueError` naming the missing keys and path.</RULE>
+      <RULE id="PY027">
+        No corrective or explanatory comments in code (e.g., "# Corrected import", "# Fixed bug").
+        All corrections, rationale, and explanations must be given in the assistant’s response outside the code block.
+        Code blocks must only contain clean, production-ready code without such commentary.
+      </RULE>
+    </PYTHON>
+
+    <JAVASCRIPT>
+      <RULE id="JS001">Use Prettier and ESLint with a consistent configuration.</RULE>
+      <RULE id="JS002">TypeScript strict mode. No implicit any.</RULE>
+      <RULE id="JS003">Use ES module syntax for imports/exports.</RULE>
+      <RULE id="JS004">Write small pure functions. Push side effects to well named services or hooks.</RULE>
+      <RULE id="JS005">Scaffold via Cookiecutter-like tool or create node package.</RULE>
+      <RULE id="JS006">Write unit tests with Jest or Mocha with high coverage and meaningful cases.</RULE>
+      <RULE id="JS007">Follow Clean Code JS practices for naming, error handling, and formatting.</RULE>
+    </JAVASCRIPT>
+  </CODING_RULES>
+</IMPORTANT_RULES>
