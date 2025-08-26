@@ -55,7 +55,7 @@ The diagram below illustrates the flow for the provided CSV script.
 
 ### Packaging
 
-The application is packaged as a standard Python library using **Poetry**. Running `poetry build` creates a portable `.whl` file that can be installed with `pip` in any environment, making it highly versatile for deployment.
+The application is packaged as a standard Python library using **Poetry**. Running `poetry build` creates a portable `.whl` file that can be installed with `pip` or `poetry` in any environment, making it highly versatile for deployment.
 
 ### Deployment Architecture for Millions of Daily Requests
 
