@@ -10,6 +10,7 @@ from .config import Config
 from .record_class import Record
 from .model_loader import get_model_and_processor
 from .scoring import score_pairs
+from .result import ScoreResult
 
 logger = logging.getLogger(__name__)
 
@@ -71,14 +72,11 @@ def score_csv(
             chunksize=config.chunksize,
             max_io_workers=config.max_io_workers,
         )
-        scores = list(score_pairs(records, model, processor, updated_config))
+        results = list(score_pairs(records, model, processor, updated_config))
 
+        scores, errors = zip(*[(res.score, res.error or "") for res in results])
         chunk["similarity"] = scores
-
-        # Add an error column for failed scores
-        chunk["error"] = [
-            "scoring failed" if pd.isna(score) else "" for score in scores
-        ]
+        chunk["error"] = errors
 
         chunk.to_csv(out_path, mode="a", header=header, index=False)
         header = False

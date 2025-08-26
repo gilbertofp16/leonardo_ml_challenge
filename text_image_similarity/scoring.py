@@ -13,6 +13,7 @@ import torch
 from .config import Config
 from .download_image_url import download_image
 from .record_class import Record
+from .result import ScoreResult
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +32,7 @@ def score_pairs(
     model,
     processor,
     config: Config,
-) -> Iterable[float]:
+) -> Iterable[ScoreResult]:
     """
     Computes similarity scores for image-text records using a pre-loaded model.
 
@@ -45,8 +46,7 @@ def score_pairs(
         config: Configuration for the scoring process.
 
     Yields:
-        A float similarity score for each input record, aligned with the input order.
-        Yields `float('nan')` for any record that fails processing.
+        A `ScoreResult` object for each input record, aligned with the input order.
     """
     # Prepare a download function with fixed timeout and retries
     downloader = partial(
@@ -70,7 +70,7 @@ def score_pairs(
                 else:
                     logger.warning(f"Failed to download or process image: {record.url}")
 
-            batch_scores = {}  # Maps index_in_batch to its score
+            batch_results = {}  # Maps index_in_batch to its ScoreResult
 
             if images:
                 try:
@@ -97,14 +97,26 @@ def score_pairs(
                         scores_list = scores.tolist()
 
                     for i, score in zip(valid_indices_in_batch, scores_list):
-                        batch_scores[i] = float(score)
+                        record = batch_records[i]
+                        batch_results[i] = ScoreResult(url=record.url, score=float(score))
 
                 except Exception as e:
-                    logger.error(f"Error processing batch: {e}")
-                    # On batch failure, all valid items in this batch get NaN
+                    error_msg = f"Error processing batch: {e}"
+                    logger.error(error_msg)
+                    # On batch failure, all valid items in this batch get an error result
                     for i in valid_indices_in_batch:
-                        batch_scores[i] = float("nan")
+                        record = batch_records[i]
+                        batch_results[i] = ScoreResult(
+                            url=record.url, score=float("nan"), error=error_msg
+                        )
 
             # Yield a result for each record in the original batch to maintain order
-            for i in range(len(batch_records)):
-                yield batch_scores.get(i, float("nan"))
+            for i, record in enumerate(batch_records):
+                yield batch_results.get(
+                    i,
+                    ScoreResult(
+                        url=record.url,
+                        score=float("nan"),
+                        error="Image download failed",
+                    ),
+                )

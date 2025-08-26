@@ -7,6 +7,16 @@ import pytest
 from PIL import Image
 from text_image_similarity.config import Config
 from text_image_similarity.pipeline import score_csv
+from tests.test_scoring import MockCLIPModel, MockCLIPProcessor
+
+
+@pytest.fixture
+def mock_model_and_processor(monkeypatch):
+    """Mocks the model and processor loading."""
+    monkeypatch.setattr(
+        "text_image_similarity.pipeline.get_model_and_processor",
+        lambda: (MockCLIPModel(), MockCLIPProcessor()),
+    )
 
 
 @pytest.fixture
@@ -32,7 +42,7 @@ def setup_csv_fixture(tmp_path):
 
 
 def test_csv_pipeline_integration(
-    mock_downloader_integration, setup_csv_fixture, tmp_path
+    mock_model_and_processor, mock_downloader_integration, setup_csv_fixture, tmp_path
 ):
     """
     Tests the full CSV pipeline from input to output.

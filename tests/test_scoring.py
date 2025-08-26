@@ -8,6 +8,7 @@ import torch
 from PIL import Image
 from text_image_similarity.config import Config
 from text_image_similarity.record_class import Record
+from text_image_similarity.result import ScoreResult
 from text_image_similarity.scoring import score_pairs
 
 
@@ -24,6 +25,9 @@ class MockCLIPModel:
         )()
 
     def to(self, device):
+        return self
+
+    def eval(self):
         return self
 
 
@@ -71,11 +75,14 @@ def test_score_pairs_returns_correct_scores(mock_downloader):
     config = Config(device="cpu")
     model, processor = MockCLIPModel(), MockCLIPProcessor()
 
-    scores = list(score_pairs(records, model, processor, config))
+    results = list(score_pairs(records, model, processor, config))
 
-    assert len(scores) == 2
-    assert all(isinstance(s, float) for s in scores)
-    assert all(s == 25.0 for s in scores)
+    assert len(results) == 2
+    assert all(isinstance(r, ScoreResult) for r in results)
+    assert results[0].score == 25.0
+    assert results[0].error is None
+    assert results[1].score == 25.0
+    assert results[1].error is None
 
 
 def test_score_pairs_handles_download_failure(mock_downloader):
@@ -89,8 +96,10 @@ def test_score_pairs_handles_download_failure(mock_downloader):
     config = Config(device="cpu")
     model, processor = MockCLIPModel(), MockCLIPProcessor()
 
-    scores = list(score_pairs(records, model, processor, config))
+    results = list(score_pairs(records, model, processor, config))
 
-    assert len(scores) == 2
-    assert scores[0] == 25.0
-    assert pd.isna(scores[1])
+    assert len(results) == 2
+    assert results[0].score == 25.0
+    assert results[0].error is None
+    assert pd.isna(results[1].score)
+    assert results[1].error == "Image download failed"
