@@ -104,3 +104,30 @@ def test_score_pairs_handles_download_failure(mock_downloader):
     assert results[0].error is None
     assert pd.isna(results[1].score)
     assert results[1].error == "Image download failed"
+
+
+def test_score_pairs_handles_batch_processing_failure(mock_downloader, monkeypatch):
+    """
+    Tests that score_pairs returns an error result for all items in a failed batch.
+    """
+    # Mock the processor to raise an exception
+    def mock_processor(*args, **kwargs):
+        raise ValueError("mock processor error")
+    monkeypatch.setattr(
+        MockCLIPProcessor,
+        "__call__",
+        mock_processor
+    )
+
+    records = [
+        Record(url="http://example.com/image1.jpg", caption="A test image"),
+        Record(url="http://example.com/image2.jpg", caption="Another test image"),
+    ]
+    config = Config(device="cpu")
+    model, processor = MockCLIPModel(), MockCLIPProcessor()
+
+    results = list(score_pairs(records, model, processor, config))
+
+    assert len(results) == 2
+    assert all(pd.isna(r.score) for r in results)
+    assert all("Error processing batch" in r.error for r in results)

@@ -78,7 +78,8 @@ def score_csv(
         chunk["similarity"] = scores
         chunk["error"] = errors
 
-        chunk.to_csv(out_path, mode="a", header=header, index=False)
+        mode = "w" if header else "a"
+        chunk.to_csv(out_path, mode=mode, header=header, index=False)
         header = False
 
     logger.info("CSV scoring process completed successfully.")

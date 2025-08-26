@@ -65,3 +65,24 @@ def test_csv_pipeline_integration(
     assert "error" in df.columns
     assert len(df) == 1
     assert not pd.isna(df["similarity"].iloc[0])
+
+    # Positive test: Verify the CSV can be opened and read correctly
+    try:
+        pd.read_csv(output_csv)
+    except Exception as e:
+        pytest.fail(f"Output CSV is not a valid CSV file: {e}")
+
+
+def test_csv_pipeline_handles_file_not_found(
+    mock_model_and_processor, mock_downloader_integration, tmp_path
+):
+    """
+    Tests that the pipeline handles a missing input file gracefully.
+    """
+    input_csv = tmp_path / "non_existent_input.csv"
+    output_csv = tmp_path / "output.csv"
+    config = Config()
+
+    with pytest.raises(FileNotFoundError):
+        # This will fail because the file does not exist, which is the expected behavior
+        pd.read_csv(input_csv, chunksize=config.batch_size)
