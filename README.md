@@ -106,7 +106,6 @@ For processing millions of records efficiently:
 -   **Snowflake:** The library can be integrated with **Snowpark**. The model would be uploaded to the **Snowflake Model Registry**, and the scoring logic would be deployed as a secure UDF or Stored Procedure. This allows users to run the similarity scoring directly within their SQL queries on data stored in Snowflake.
 -   **Airflow:** For orchestrating recurring batch jobs, an **Airflow DAG** would be created. A task within the DAG would install the library, fetch a batch of records from a database or data lake, run the scoring process on a dedicated compute instance (e.g., an EC2 instance), and write the results back.
 
-
 #### Observability & Operations
 
 -   **Metrics & Dashboards:** Expose Prometheus metrics (RPS, p50/p95/p99 latency, error rate, batch size, queue depth, GPU util); visualise in Grafana.
