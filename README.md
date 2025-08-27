@@ -28,7 +28,7 @@ The code is packaged as a reusable Python library in the `text_image_similarity`
 
 The main logic is in the `score_pairs` function, which takes an iterable of `Record` objects and returns an iterable of `ScoreResult` objects. It performs the following steps:
 1.  **Concurrent Image Downloading:** Downloads images in parallel using a `ThreadPoolExecutor`.
-2.  **Preprocessing:** Prepares images and text for the `openai/clip-vit-base-patch32` model.
+2.  **Preprocessing:** Prepares images and text for the `openai/clip-vit-base-patch32` model. I chose CLIP ViT-B/32 for a fast, deterministic, self-hostable dual-encoder that batch-scores cheaply today; if we need higher accuracy later, we can swap to SigLIP/OpenCLIP/EVA or add a cross-encoder/VLM reranker without changing the pipeline.
 3.  **Embedding Generation:** Generates vector embeddings for images and text.
 4.  **Similarity Calculation:** Computes the cosine similarity, normalizes it to a 0-1 range, and rounds to four decimal places.
 
