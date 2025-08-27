@@ -26,7 +26,6 @@ def test_download_image_success():
         image = download_image("http://example.com/image.jpg", 10, 0)
         assert isinstance(image, Image.Image)
 
-
 def test_download_image_failure():
     """Tests that download_image returns None on network failure."""
     with patch("httpx.Client") as mock_client:
