@@ -44,32 +44,32 @@ The diagram below illustrates the flow for the provided CSV script.
 
 ### Time and Memory Footprint
 
-- **Memory:**  
-  The CLIP `ViT-B/32` model requires roughly **600 MB** of RAM/VRAM.  
-  Memory usage grows primarily with **batch size**, since more images and captions are held in memory simultaneously.  
-  The pipeline itself streams CSV data in chunks, keeping the overall memory footprint stable and predictable.  
+- **Memory:**
+  The CLIP `ViT-B/32` model requires roughly **600 MB** of RAM/VRAM.
+  Memory usage grows primarily with **batch size**, since more images and captions are held in memory simultaneously.
+  The pipeline itself streams CSV data in chunks, keeping the overall memory footprint stable and predictable.
 
-- **Time:**  
-  The main bottlenecks are:  
-  1. **Image Downloading (I/O-bound):** Dependent on network latency and image size.  
-  2. **Model Inference (compute-bound):** Forward passes through the CLIP model; significantly faster on GPU compared to CPU.  
+- **Time:**
+  The main bottlenecks are:
+  1. **Image Downloading (I/O-bound):** Dependent on network latency and image size.
+  2. **Model Inference (compute-bound):** Forward passes through the CLIP model; significantly faster on GPU compared to CPU.
 
 ### Optimisation Strategies
 
-- **Concurrent I/O (Implemented):**  
-  Images are downloaded in parallel using a `ThreadPoolExecutor`, reducing wait time on network-bound operations.  
+- **Concurrent I/O (Implemented):**
+  Images are downloaded in parallel using a `ThreadPoolExecutor`, reducing wait time on network-bound operations.
 
-- **Batching (Implemented):**  
-  Records are processed in batches, enabling the model to exploit GPU parallelism and minimise per-sample overhead.  
+- **Batching (Implemented):**
+  Records are processed in batches, enabling the model to exploit GPU parallelism and minimise per-sample overhead.
 
-- **Hardware Acceleration & FP16 (Supported):**  
-  The system can auto-detect GPUs (`cuda`, `mps`) and run in half precision (`fp16`) for faster inference and lower VRAM use, where supported.  
+- **Hardware Acceleration & FP16 (Supported):**
+  The system can auto-detect GPUs (`cuda`, `mps`) and run in half precision (`fp16`) for faster inference and lower VRAM use, where supported.
 
-- **Additional Future Optimisations:**  
-  - **Quantisation:** Convert weights to INT8 for reduced memory footprint and faster CPU inference.  
-  - **Distillation:** Train a smaller “student” model to approximate CLIP’s performance with lower compute cost.  
-  - **Caching:** Cache downloaded images and/or embeddings to avoid repeated downloads or re-computation for duplicate data.  
-  - **Distributed Inference:** Use frameworks like **Triton/KServe/Ray Serve** to parallelise inference across multiple GPUs/nodes for large-scale throughput.  
+- **Additional Future Optimisations:**
+  - **Quantisation:** Convert weights to INT8 for reduced memory footprint and faster CPU inference.
+  - **Distillation:** Train a smaller “student” model to approximate CLIP’s performance with lower compute cost.
+  - **Caching:** Cache downloaded images and/or embeddings to avoid repeated downloads or re-computation for duplicate data.
+  - **Distributed Inference:** Use frameworks like **Triton/KServe/Ray Serve** to parallelise inference across multiple GPUs/nodes for large-scale throughput.
 
 ---
 
@@ -79,11 +79,11 @@ The diagram below illustrates the flow for the provided CSV script.
 
 **Package once, run everywhere.**
 
-- **Library:** `poetry build` → wheel (`dist/text_image_similarity-*.whl`) installable via `pip/poetry` in jobs or services.  
-- **Container:** Docker image that includes the wheel and runtime deps (`torch`, `fastapi`, etc.).  
-  - Publish to a registry (e.g., **Amazon ECR**, GitHub Container Registry, or GCP Artifact Registry).  
-  - The wheel itself can also be stored in **AWS CodeArtifact** or ECR for **proper versioning control** and traceability across environments.  
-- These artifacts are then deployed to Kubernetes or used in batch/data processing platforms.  
+- **Library:** `poetry build` → wheel (`dist/text_image_similarity-*.whl`) installable via `pip/poetry` in jobs or services.
+- **Container:** Docker image that includes the wheel and runtime deps (`torch`, `fastapi`, etc.).
+  - Publish to a registry (e.g., **Amazon ECR**, GitHub Container Registry, or GCP Artifact Registry).
+  - The wheel itself can also be stored in **AWS CodeArtifact** or ECR for **proper versioning control** and traceability across environments.
+- These artifacts are then deployed to Kubernetes or used in batch/data processing platforms.
 
 ### Deployment Architecture for Millions of Daily Requests
 

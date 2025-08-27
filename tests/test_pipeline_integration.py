@@ -80,7 +80,6 @@ def test_csv_pipeline_handles_file_not_found(
     Tests that the pipeline handles a missing input file gracefully.
     """
     input_csv = tmp_path / "non_existent_input.csv"
-    output_csv = tmp_path / "output.csv"
     config = Config()
 
     with pytest.raises(FileNotFoundError):

@@ -1,24 +1,25 @@
 # .pre-commit-config.yaml
 repos:
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.6.8  # pin to latest stable
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
     hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.0
+    hooks:
+      # Run the linter and fix autofixable errors
       - id: ruff
-        args: [--fix]
+        args: [--fix, --exit-non-zero-on-fix]
+      # Run the formatter
       - id: ruff-format
 
-  - repo: https://github.com/psf/black
-    rev: 24.8.0
-    hooks:
-      - id: black
-
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.1
+    rev: v1.11.0
     hooks:
       - id: mypy
-        additional_dependencies: [types-requests, types-Pillow]
+        # The additional dependencies need to match what we installed with poetry
+        additional_dependencies: [pandas-stubs, types-pytz]

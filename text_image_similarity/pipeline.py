@@ -10,7 +10,6 @@ from .config import Config
 from .record_class import Record
 from .model_loader import get_model_and_processor
 from .scoring import score_pairs
-from .result import ScoreResult
 
 logger = logging.getLogger(__name__)
 

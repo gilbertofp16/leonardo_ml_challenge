@@ -110,14 +110,12 @@ def test_score_pairs_handles_batch_processing_failure(mock_downloader, monkeypat
     """
     Tests that score_pairs returns an error result for all items in a failed batch.
     """
+
     # Mock the processor to raise an exception
     def mock_processor(*args, **kwargs):
         raise ValueError("mock processor error")
-    monkeypatch.setattr(
-        MockCLIPProcessor,
-        "__call__",
-        mock_processor
-    )
+
+    monkeypatch.setattr(MockCLIPProcessor, "__call__", mock_processor)
 
     records = [
         Record(url="http://example.com/image1.jpg", caption="A test image"),

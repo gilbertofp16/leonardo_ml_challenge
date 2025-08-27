@@ -2,6 +2,7 @@
 """
 Configuration for the scoring process.
 """
+
 from dataclasses import dataclass
 from typing import Literal, Optional
 
