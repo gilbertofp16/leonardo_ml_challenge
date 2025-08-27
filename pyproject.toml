@@ -23,6 +23,8 @@ pytest = "^8.2.2"
 pytest-cov = "^5.0.0"
 ruff = "^0.5.0"
 black = "^24.4.2"
+mypy = "^1.5.1"
+pandas-stubs = "^2.3.0.250703"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
